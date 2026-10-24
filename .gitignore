@@ -1,0 +1,6 @@
+# downloaded data and generated models (recreate with the commands in README)
+data/
+artifacts/
+web/fallback.js
+reports/*.log
+__pycache__/
