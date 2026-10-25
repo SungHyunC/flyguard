@@ -160,7 +160,12 @@ export class Maze {
     this.reset();
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement);
     this.resize();
-    this.renderer.setAnimationLoop((now) => this.tick(now));
+    this.setActive(true);
+  }
+
+  setActive(on) {
+    this.renderer.setAnimationLoop(on ? (now) => this.tick(now) : null);
+    this.last = 0;
   }
 
   buildMaze() {

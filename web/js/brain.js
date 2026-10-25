@@ -2,7 +2,7 @@
 // activity flows in two waves: glomeruli -> active Kenyon cells, then Kenyon cells -> the MBON each
 // one votes for (red = quarantine, green = pass).
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { clamp, css, dotTexture, textSprite } from './util.js';
 
 const MAX_SEGMENTS = 6000;
@@ -29,7 +29,9 @@ function lines() {
 }
 
 export class Brain {
-  constructor(canvas, layout) {
+  // options.labels: name the parts; options.frame: 'circuit' (zoom on the mushroom body) or 'brain'.
+  constructor(canvas, layout, options = {}) {
+    this.options = { labels: true, frame: 'circuit', ...options };
     this.canvas = canvas;
     this.layout = layout;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -93,8 +95,13 @@ export class Brain {
     const mean = (arr) => arr.reduce((acc, p) => acc.add(this.v(p)), new THREE.Vector3()).multiplyScalar(1 / arr.length);
     this.centroids = { kc: mean(layout.kc), glom: mean(layout.glom) };
     const focus = this.centroids.kc.clone().add(this.centroids.glom).add(this.mbonPos.approach).add(this.mbonPos.avoid).multiplyScalar(0.25);
-    this.controls.target.copy(focus);
-    this.camera.position.copy(focus).add(new THREE.Vector3(1.4, 0.9, 4.8));
+    if (this.options.frame === 'brain') {
+      this.controls.target.set(0, 0, 0);
+      this.camera.position.set(0, 1.2, 9.2);
+    } else {
+      this.controls.target.copy(focus);
+      this.camera.position.copy(focus).add(new THREE.Vector3(1.4, 0.9, 4.8));
+    }
 
     this.labels = new THREE.Group();
     this.scene.add(this.labels);
@@ -104,7 +111,12 @@ export class Brain {
     new ResizeObserver(() => this.resize()).observe(canvas.parentElement);
     this.resize();
     this.last = 0;
-    this.renderer.setAnimationLoop((now) => this.tick(now));
+    this.setActive(true);
+  }
+
+  setActive(on) {
+    this.renderer.setAnimationLoop(on ? (now) => this.tick(now) : null);
+    this.last = 0;
   }
 
   applyTheme() {
@@ -132,6 +144,10 @@ export class Brain {
     if (this.outline) this.outline.material.color.set(css('--muted'));
 
     this.labels.clear();
+    if (!this.options.labels) {
+      if (this.trace) this.show(this.trace, false);
+      return;
+    }
     const label = (text, pos, color, dx, dy) => {
       const s = textSprite(text, { color, height: 0.2 });
       s.position.copy(pos).add(new THREE.Vector3(dx, dy, 0));
