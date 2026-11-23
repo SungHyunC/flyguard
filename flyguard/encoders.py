@@ -14,6 +14,7 @@ import numpy as np
 from .paths import ARTIFACTS, CACHE, ensure_dirs
 
 MINILM = "sentence-transformers/all-MiniLM-L6-v2"
+E5 = "intfloat/multilingual-e5-base"
 
 
 def _device() -> str:
@@ -32,6 +33,34 @@ class MiniLMEncoder:
     def encode(self, texts) -> np.ndarray:
         return self.model.encode(list(texts), batch_size=256, normalize_embeddings=True,
                                  show_progress_bar=False).astype(np.float32)
+
+
+class E5Encoder:
+    """Frozen multilingual sentence embedding (768-d, L2-normalised): intfloat/multilingual-e5-base,
+    mean-pooled, with the "query: " prefix it was trained with. Unlike MiniLM it reads Korean."""
+    name = "e5"
+
+    def __init__(self, device: str | None = None, max_len: int = 256):
+        import torch
+        from transformers import AutoModel, AutoTokenizer
+        self.device = torch.device(device or _device())
+        self.tok = AutoTokenizer.from_pretrained(E5)
+        self.model = AutoModel.from_pretrained(E5).to(self.device).eval()
+        self.max_len = max_len
+
+    def encode(self, texts, batch_size: int = 128) -> np.ndarray:
+        import torch
+        texts, out = ["query: " + t for t in texts], []
+        with torch.no_grad():
+            for i in range(0, len(texts), batch_size):
+                enc = self.tok(texts[i:i + batch_size], padding=True, truncation=True,
+                               max_length=self.max_len, return_tensors="pt").to(self.device)
+                with torch.autocast(self.device.type, dtype=torch.bfloat16, enabled=self.device.type == "cuda"):
+                    hidden = self.model(**enc).last_hidden_state
+                mask = enc["attention_mask"].unsqueeze(-1).to(hidden.dtype)
+                pooled = (hidden * mask).sum(1) / mask.sum(1)
+                out.append(torch.nn.functional.normalize(pooled.float(), dim=-1).cpu().numpy())
+        return np.concatenate(out).astype(np.float32)
 
 
 class CharNgramEncoder:
