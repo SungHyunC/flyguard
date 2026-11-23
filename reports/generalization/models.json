@@ -1,0 +1,79 @@
+{
+ "TF-IDF + 로지스틱 회귀": {
+  "family": "기준",
+  "threshold": 0.3619955755657886,
+  "threshold_fpr1": 0.6080657243728638,
+  "latency_ms": 0.8,
+  "seconds": 16
+ },
+ "MiniLM 고정 + 로지스틱 회귀": {
+  "family": "기준",
+  "threshold": 0.43081813631345295,
+  "threshold_fpr1": 0.7597044706344604,
+  "latency_ms": 6.3,
+  "seconds": 20
+ },
+ "초파리 · 고정 MiniLM 코": {
+  "family": "초파리",
+  "threshold": 0.34701463595107573,
+  "threshold_fpr1": 0.9367177486419678,
+  "latency_ms": 6.5,
+  "seconds": 18
+ },
+ "ModernBERT 미세조정 1개": {
+  "family": "미세조정",
+  "threshold": 0.5024005862785965,
+  "threshold_fpr1": 0.9949396848678589,
+  "latency_ms": 17.5,
+  "seconds": 62
+ },
+ "하이브리드 ModernBERT · 초파리 투표": {
+  "family": "초파리",
+  "threshold": 0.5141636601944071,
+  "threshold_fpr1": 0.5238552689552307,
+  "latency_ms": 112.1,
+  "seconds": 316
+ },
+ "하이브리드 ModernBERT · 헤드 앙상블": {
+  "family": "미세조정",
+  "threshold": 0.3243863735366731,
+  "threshold_fpr1": 0.37832018733024597,
+  "latency_ms": 118.1,
+  "seconds": 308
+ },
+ "하이브리드 MiniLM · 초파리 투표": {
+  "family": "초파리",
+  "threshold": 0.719102383258953,
+  "threshold_fpr1": 0.6446118354797363,
+  "latency_ms": 33.6,
+  "seconds": 57
+ },
+ "하이브리드 MiniLM · 헤드 앙상블": {
+  "family": "미세조정",
+  "threshold": 0.3803342347169043,
+  "threshold_fpr1": 0.61509770154953,
+  "latency_ms": 38.1,
+  "seconds": 52
+ },
+ "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
+  "family": "외부",
+  "threshold": 5.955139386060182e-06,
+  "threshold_fpr1": 0.0012843082658946514,
+  "latency_ms": 25.5,
+  "seconds": 133
+ },
+ "Qwen2.5-1.5B 제로샷 (거대언어모델)": {
+  "family": "외부",
+  "threshold": 0.0011695101857185364,
+  "threshold_fpr1": 0.01243165135383606,
+  "latency_ms": 46.8,
+  "seconds": 169
+ },
+ "Qwen3-4B 제로샷 (거대언어모델)": {
+  "family": "외부",
+  "threshold": 1.5229980832032197e-08,
+  "threshold_fpr1": 3.224186784223093e-08,
+  "latency_ms": 113.6,
+  "seconds": 773
+ }
+}

@@ -116,18 +116,26 @@ class FlyMushroomBody:
         self.N0 = self.N1 = 0
         return self.partial_fit(P, y)
 
-    def partial_fit(self, P: np.ndarray, y) -> "FlyMushroomBody":
-        """Online dopamine learning: count which KCs fired for each class."""
+    def partial_fit(self, P: np.ndarray, y, weight: float = 1) -> "FlyMushroomBody":
+        """Online dopamine learning: count which KCs fired for each class. `weight` scales the dose
+        of these prompts (a stronger punishment or reward); each prompt then counts as `weight` prompts."""
         if self.homeostasis and self.mu is None:
             raise RuntimeError("call develop() on unlabelled prompts before partial_fit()")
         if self.n0 is None:
             self.n0, self.n1 = np.zeros(self.wiring.n_kc), np.zeros(self.wiring.n_kc)
         H, y = self.kc_code(P), np.asarray(y)
-        self.n1 += np.asarray(H[y == 1].sum(0)).ravel()
-        self.n0 += np.asarray(H[y == 0].sum(0)).ravel()
-        self.N1 += int((y == 1).sum())
-        self.N0 += int((y == 0).sum())
+        self.n1 += weight * np.asarray(H[y == 1].sum(0)).ravel()
+        self.n0 += weight * np.asarray(H[y == 0].sum(0)).ravel()
+        self.N1 += weight * int((y == 1).sum())
+        self.N0 += weight * int((y == 0).sum())
         return self
+
+    def novelty(self, H: sparse.csr_matrix, beta: float | None = None) -> np.ndarray:
+        """Response of a valence-free novelty MBON: its synapse from a KC is depressed whenever that KC
+        fires, whatever the class (like MBON-α'3, Hattori et al. 2017). 1 = only never-used KCs fired."""
+        b = self.beta if beta is None else beta
+        w = np.exp(-b * (self.n0 + self.n1) / max(self.N0 + self.N1, 1))
+        return H @ w / np.maximum(np.diff(H.indptr), 1)
 
     def weights(self, beta: float | None = None) -> tuple[np.ndarray, np.ndarray]:
         """(w_approach, w_avoid): KC->MBON synapse strengths in [0, 1]."""

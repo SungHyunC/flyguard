@@ -1,0 +1,484 @@
+{
+ "occlusion": {
+  "TF-IDF + 로지스틱 회귀": {
+   "top_words": [
+    [
+     "rules",
+     0.259
+    ],
+    [
+     "instructions",
+     0.219
+    ],
+    [
+     "initialization",
+     0.211
+    ],
+    [
+     "config",
+     0.21
+    ],
+    [
+     "share",
+     0.147
+    ],
+    [
+     "restrictions",
+     0.143
+    ],
+    [
+     "configuration",
+     0.143
+    ],
+    [
+     "guidelines",
+     0.128
+    ]
+   ],
+   "flip_share": 0.21379310344827587,
+   "detected": 145,
+   "benign_trigger_words": [
+    [
+     "apply",
+     0.066
+    ],
+    [
+     "enable",
+     0.051
+    ],
+    [
+     "when",
+     0.048
+    ],
+    [
+     "implementing",
+     0.026
+    ],
+    [
+     "procedures",
+     0.025
+    ]
+   ]
+  },
+  "초파리 · 고정 MiniLM 코": {
+   "top_words": [
+    [
+     "guidelines",
+     0.266
+    ],
+    [
+     "instructions",
+     0.233
+    ],
+    [
+     "config",
+     0.216
+    ],
+    [
+     "hidden",
+     0.161
+    ],
+    [
+     "revealing",
+     0.16
+    ],
+    [
+     "restrictions",
+     0.159
+    ],
+    [
+     "prompt",
+     0.158
+    ],
+    [
+     "rules",
+     0.152
+    ]
+   ],
+   "flip_share": 0.23741007194244604,
+   "detected": 139,
+   "benign_trigger_words": [
+    [
+     "enable",
+     0.151
+    ],
+    [
+     "my",
+     0.129
+    ],
+    [
+     "procedures",
+     0.117
+    ],
+    [
+     "includes",
+     0.103
+    ],
+    [
+     "of",
+     0.091
+    ]
+   ]
+  },
+  "ModernBERT 미세조정 1개": {
+   "top_words": [
+    [
+     "revealing",
+     0.398
+    ],
+    [
+     "hidden",
+     0.19
+    ],
+    [
+     "tell",
+     0.171
+    ],
+    [
+     "disclosure",
+     0.152
+    ],
+    [
+     "show",
+     0.103
+    ],
+    [
+     "initialization",
+     0.096
+    ],
+    [
+     "configuration",
+     0.071
+    ],
+    [
+     "reveal",
+     0.068
+    ]
+   ],
+   "flip_share": 0.14084507042253522,
+   "detected": 142,
+   "benign_trigger_words": [
+    [
+     "includes",
+     0.196
+    ],
+    [
+     "benign",
+     0.186
+    ],
+    [
+     "indicate",
+     0.028
+    ],
+    [
+     "apply",
+     0.01
+    ],
+    [
+     "considerations",
+     0.007
+    ]
+   ]
+  },
+  "하이브리드 ModernBERT · 초파리 투표": {
+   "top_words": [
+    [
+     "revealing",
+     0.164
+    ],
+    [
+     "tell",
+     0.138
+    ],
+    [
+     "hidden",
+     0.127
+    ],
+    [
+     "show",
+     0.09
+    ],
+    [
+     "showing",
+     0.056
+    ],
+    [
+     "your",
+     0.055
+    ],
+    [
+     "parameters",
+     0.055
+    ],
+    [
+     "share",
+     0.053
+    ]
+   ],
+   "flip_share": 0.1095890410958904,
+   "detected": 146,
+   "benign_trigger_words": [
+    [
+     "benign",
+     0.194
+    ],
+    [
+     "indicate",
+     0.115
+    ],
+    [
+     "includes",
+     0.063
+    ],
+    [
+     "procedures",
+     0.018
+    ],
+    [
+     "apply",
+     0.0
+    ]
+   ]
+  },
+  "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
+   "top_words": [
+    [
+     "revealing",
+     0.599
+    ],
+    [
+     "instructions",
+     0.581
+    ],
+    [
+     "reveal",
+     0.418
+    ],
+    [
+     "prompt",
+     0.417
+    ],
+    [
+     "sharing",
+     0.331
+    ],
+    [
+     "configuration",
+     0.315
+    ],
+    [
+     "guidelines",
+     0.305
+    ],
+    [
+     "config",
+     0.283
+    ]
+   ],
+   "flip_share": 0.28169014084507044,
+   "detected": 142,
+   "benign_trigger_words": [
+    [
+     "benign",
+     0.279
+    ],
+    [
+     "of",
+     0.171
+    ],
+    [
+     "technical",
+     0.001
+    ],
+    [
+     "includes",
+     0.0
+    ],
+    [
+     "changes",
+     0.0
+    ]
+   ]
+  }
+ },
+ "position": {
+  "TF-IDF + 로지스틱 회귀": {
+   "start": {
+    "truncated": 0.415,
+    "windowed": 0.535
+   },
+   "middle": {
+    "truncated": 0.42,
+    "windowed": 0.61
+   },
+   "end": {
+    "truncated": 0.415,
+    "windowed": 0.605
+   },
+   "clean_fpr": {
+    "truncated": 0.215,
+    "windowed": 0.33
+   }
+  },
+  "초파리 · 고정 MiniLM 코": {
+   "start": {
+    "truncated": 0.125,
+    "windowed": 0.235
+   },
+   "middle": {
+    "truncated": 0.06,
+    "windowed": 0.2
+   },
+   "end": {
+    "truncated": 0.07,
+    "windowed": 0.23
+   },
+   "clean_fpr": {
+    "truncated": 0.055,
+    "windowed": 0.165
+   }
+  },
+  "ModernBERT 미세조정 1개": {
+   "start": {
+    "truncated": 0.315,
+    "windowed": 0.52
+   },
+   "middle": {
+    "truncated": 0.285,
+    "windowed": 0.67
+   },
+   "end": {
+    "truncated": 0.285,
+    "windowed": 0.71
+   },
+   "clean_fpr": {
+    "truncated": 0.165,
+    "windowed": 0.395
+   }
+  },
+  "하이브리드 ModernBERT · 초파리 투표": {
+   "start": {
+    "truncated": 0.2,
+    "windowed": 0.4
+   },
+   "middle": {
+    "truncated": 0.19,
+    "windowed": 0.53
+   },
+   "end": {
+    "truncated": 0.155,
+    "windowed": 0.545
+   },
+   "clean_fpr": {
+    "truncated": 0.095,
+    "windowed": 0.32
+   }
+  },
+  "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
+   "start": {
+    "truncated": 0.95,
+    "windowed": 0.975
+   },
+   "middle": {
+    "truncated": 0.89,
+    "windowed": 0.955
+   },
+   "end": {
+    "truncated": 0.865,
+    "windowed": 0.94
+   },
+   "clean_fpr": {
+    "truncated": 0.795,
+    "windowed": 0.87
+   }
+  }
+ },
+ "characters": {
+  "TF-IDF + 로지스틱 회귀": {
+   "원문 (대조)": 0.015,
+   "끝에 ' merci beaucoup' (프랑스어, ASCII)": 0.005,
+   "끝에 ' 감사합니다.' (한국어)": 0.015,
+   "끝에 ' 😊' (이모지)": 0.015,
+   "첫 단어 뒤에 투명문자 (U+200B)": 0.02,
+   "o·e·a를 생김새가 같은 키릴 글자로": 0.075
+  },
+  "초파리 · 고정 MiniLM 코": {
+   "원문 (대조)": 0.115,
+   "끝에 ' merci beaucoup' (프랑스어, ASCII)": 0.095,
+   "끝에 ' 감사합니다.' (한국어)": 0.1475,
+   "끝에 ' 😊' (이모지)": 0.1475,
+   "첫 단어 뒤에 투명문자 (U+200B)": 0.115,
+   "o·e·a를 생김새가 같은 키릴 글자로": 0.2225
+  },
+  "ModernBERT 미세조정 1개": {
+   "원문 (대조)": 0.0325,
+   "끝에 ' merci beaucoup' (프랑스어, ASCII)": 0.2,
+   "끝에 ' 감사합니다.' (한국어)": 0.4725,
+   "끝에 ' 😊' (이모지)": 0.0425,
+   "첫 단어 뒤에 투명문자 (U+200B)": 0.0525,
+   "o·e·a를 생김새가 같은 키릴 글자로": 0.9925
+  },
+  "하이브리드 ModernBERT · 초파리 투표": {
+   "원문 (대조)": 0.0175,
+   "끝에 ' merci beaucoup' (프랑스어, ASCII)": 0.085,
+   "끝에 ' 감사합니다.' (한국어)": 0.7125,
+   "끝에 ' 😊' (이모지)": 0.0225,
+   "첫 단어 뒤에 투명문자 (U+200B)": 0.035,
+   "o·e·a를 생김새가 같은 키릴 글자로": 0.9975
+  },
+  "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
+   "원문 (대조)": 0.0625,
+   "끝에 ' merci beaucoup' (프랑스어, ASCII)": 0.1575,
+   "끝에 ' 감사합니다.' (한국어)": 0.155,
+   "끝에 ' 😊' (이모지)": 0.0475,
+   "첫 단어 뒤에 투명문자 (U+200B)": 0.3725,
+   "o·e·a를 생김새가 같은 키릴 글자로": 0.9925
+  }
+ },
+ "calibration": {
+  "TF-IDF + 로지스틱 회귀": {
+   "id": 0.04853737690458976,
+   "ood": 0.1798465184158217
+  },
+  "MiniLM 고정 + 로지스틱 회귀": {
+   "id": 0.02982429864291971,
+   "ood": 0.2651204220379297
+  },
+  "초파리 · 고정 MiniLM 코": {
+   "id": 0.028127169646127676,
+   "ood": 0.3215640040701042
+  },
+  "ModernBERT 미세조정 1개": {
+   "id": 0.03038617853772983,
+   "ood": 0.30351386321141915
+  },
+  "하이브리드 ModernBERT · 초파리 투표": {
+   "id": 0.017832412204923716,
+   "ood": 0.23093136783057716
+  },
+  "하이브리드 ModernBERT · 헤드 앙상블": {
+   "id": 0.02044699400934217,
+   "ood": 0.2716424573263473
+  },
+  "하이브리드 MiniLM · 초파리 투표": {
+   "id": 0.021147893308203103,
+   "ood": 0.27444949000403174
+  },
+  "하이브리드 MiniLM · 헤드 앙상블": {
+   "id": 0.02058737337817992,
+   "ood": 0.26009902216631947
+  },
+  "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
+   "id": 0.14707007190411642,
+   "ood": 0.35225471931348684
+  },
+  "Qwen2.5-1.5B 제로샷 (거대언어모델)": {
+   "id": 0.35596863671548595,
+   "ood": 0.2692866639928571
+  },
+  "Qwen3-4B 제로샷 (거대언어모델)": {
+   "id": 0.33014199024475027,
+   "ood": 0.29510113634268553
+  }
+ }
+}

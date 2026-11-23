@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 RAW = DATA / "raw"
 CONNECTOME = DATA / "connectome"
+EXTERNAL = DATA / "external"           # evaluation-only datasets (flyguard.external)
 ARTIFACTS = ROOT / "artifacts"
 DEMO = ARTIFACTS / "demo"           # what the web demo loads (flyguard.build)
 CACHE = ARTIFACTS / "cache"

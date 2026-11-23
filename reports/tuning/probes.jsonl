@@ -1,0 +1,43 @@
+{"encoder": "MiniLM", "layer": 0, "pretrained_probe_acc": 0.9857278782112274, "finetuned_probe_acc": 0.9857278782112274, "cka": 0.9998924158532096}
+{"encoder": "MiniLM", "layer": 1, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9866793529971456, "cka": 0.9901367646291123}
+{"encoder": "MiniLM", "layer": 2, "pretrained_probe_acc": 0.9904852521408183, "finetuned_probe_acc": 0.9952426260704091, "cka": 0.9670213212218339}
+{"encoder": "MiniLM", "layer": 3, "pretrained_probe_acc": 0.9866793529971456, "finetuned_probe_acc": 0.9952426260704091, "cka": 0.8427297821574373}
+{"encoder": "MiniLM", "layer": 4, "pretrained_probe_acc": 0.9828734538534729, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.6388668115110103}
+{"encoder": "MiniLM", "layer": 5, "pretrained_probe_acc": 0.9828734538534729, "finetuned_probe_acc": 0.9847764034253093, "cka": 0.48912232256939436}
+{"encoder": "MiniLM", "layer": 6, "pretrained_probe_acc": 0.9790675547098002, "finetuned_probe_acc": 0.9838249286393911, "cka": 0.3962433114376435}
+{"encoder": "ModernBERT", "layer": 0, "pretrained_probe_acc": 0.9961941008563273, "finetuned_probe_acc": 0.9961941008563273, "cka": 0.9999880833325412}
+{"encoder": "ModernBERT", "layer": 1, "pretrained_probe_acc": 0.994291151284491, "finetuned_probe_acc": 0.9952426260704091, "cka": 0.9871163869947226}
+{"encoder": "ModernBERT", "layer": 2, "pretrained_probe_acc": 0.9895337773549001, "finetuned_probe_acc": 0.9961941008563273, "cka": 0.9732545125137407}
+{"encoder": "ModernBERT", "layer": 3, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.9952426260704091, "cka": 0.9396643484393322}
+{"encoder": "ModernBERT", "layer": 4, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.994291151284491, "cka": 0.8817333089253576}
+{"encoder": "ModernBERT", "layer": 5, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.5384662360150595}
+{"encoder": "ModernBERT", "layer": 6, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.5731734119455372}
+{"encoder": "ModernBERT", "layer": 7, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.6001634990998398}
+{"encoder": "ModernBERT", "layer": 8, "pretrained_probe_acc": 0.9885823025689819, "finetuned_probe_acc": 0.9914367269267365, "cka": 0.6190098738098009}
+{"encoder": "ModernBERT", "layer": 9, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9904852521408183, "cka": 0.6314272819741098}
+{"encoder": "ModernBERT", "layer": 10, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9914367269267365, "cka": 0.5351200665712564}
+{"encoder": "ModernBERT", "layer": 11, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.5803222695999762}
+{"encoder": "ModernBERT", "layer": 12, "pretrained_probe_acc": 0.9857278782112274, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.43407618238093965}
+{"encoder": "ModernBERT", "layer": 13, "pretrained_probe_acc": 0.9866793529971456, "finetuned_probe_acc": 0.994291151284491, "cka": 0.43777093916707527}
+{"encoder": "ModernBERT", "layer": 14, "pretrained_probe_acc": 0.9866793529971456, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.43882178271967487}
+{"encoder": "ModernBERT", "layer": 15, "pretrained_probe_acc": 0.9904852521408183, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.4349784678532729}
+{"encoder": "ModernBERT", "layer": 16, "pretrained_probe_acc": 0.9904852521408183, "finetuned_probe_acc": 0.994291151284491, "cka": 0.023831268335665224}
+{"encoder": "ModernBERT", "layer": 17, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.025061765713199773}
+{"encoder": "ModernBERT", "layer": 18, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.024805183819697808}
+{"encoder": "ModernBERT", "layer": 19, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.994291151284491, "cka": 0.03276859917568686}
+{"encoder": "ModernBERT", "layer": 20, "pretrained_probe_acc": 0.9904852521408183, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.03782147156555663}
+{"encoder": "ModernBERT", "layer": 21, "pretrained_probe_acc": 0.9885823025689819, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.041146186478237715}
+{"encoder": "ModernBERT", "layer": 22, "pretrained_probe_acc": 0.9857278782112274, "finetuned_probe_acc": 0.994291151284491, "cka": 0.5228914272647578}
+{"encoder": "다국어 e5", "layer": 0, "pretrained_probe_acc": 0.9876308277830638, "finetuned_probe_acc": 0.9876308277830638, "cka": 0.9999945287147294}
+{"encoder": "다국어 e5", "layer": 1, "pretrained_probe_acc": 0.9866793529971456, "finetuned_probe_acc": 0.9876308277830638, "cka": 0.9990977026537203}
+{"encoder": "다국어 e5", "layer": 2, "pretrained_probe_acc": 0.9895337773549001, "finetuned_probe_acc": 0.9895337773549001, "cka": 0.99522101348323}
+{"encoder": "다국어 e5", "layer": 3, "pretrained_probe_acc": 0.9895337773549001, "finetuned_probe_acc": 0.9904852521408183, "cka": 0.9880918404253266}
+{"encoder": "다국어 e5", "layer": 4, "pretrained_probe_acc": 0.9857278782112274, "finetuned_probe_acc": 0.9933396764985728, "cka": 0.9766738354242804}
+{"encoder": "다국어 e5", "layer": 5, "pretrained_probe_acc": 0.9933396764985728, "finetuned_probe_acc": 0.9961941008563273, "cka": 0.9411846972099197}
+{"encoder": "다국어 e5", "layer": 6, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.994291151284491, "cka": 0.8853775248723341}
+{"encoder": "다국어 e5", "layer": 7, "pretrained_probe_acc": 0.9914367269267365, "finetuned_probe_acc": 0.994291151284491, "cka": 0.8207225560804426}
+{"encoder": "다국어 e5", "layer": 8, "pretrained_probe_acc": 0.9923882017126546, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.7383909934070579}
+{"encoder": "다국어 e5", "layer": 9, "pretrained_probe_acc": 0.9933396764985728, "finetuned_probe_acc": 0.9923882017126546, "cka": 0.5997253430279472}
+{"encoder": "다국어 e5", "layer": 10, "pretrained_probe_acc": 0.994291151284491, "finetuned_probe_acc": 0.9914367269267365, "cka": 0.5291515237745255}
+{"encoder": "다국어 e5", "layer": 11, "pretrained_probe_acc": 0.994291151284491, "finetuned_probe_acc": 0.9885823025689819, "cka": 0.5183102979987405}
+{"encoder": "다국어 e5", "layer": 12, "pretrained_probe_acc": 0.9961941008563273, "finetuned_probe_acc": 0.9857278782112274, "cka": 0.49410526465616145}
