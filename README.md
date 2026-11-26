@@ -4,6 +4,10 @@
 - **데이터:** [S-Labs/prompt-injection-dataset](https://huggingface.co/datasets/S-Labs/prompt-injection-dataset) (영어, 정상 0 / 인젝션 1)
 - **실제 뇌 배선:** FlyWire 커넥톰
 
+![FlyGuard 모델 구조: 문장이 초파리의 코(문장 인코더), 안테나엽, 실제 FlyWire 배선의 케년세포, 도파민으로 학습한 MBON을 거쳐 LLM으로 보낼지 격리할지 정해지는 과정](docs/figures/architecture_fly.png)
+
+모델이 어떻게 돌아가는지는 위 그림 한 장에 담았어요. 단계별 설명은 [어떻게 동작하나](#어떻게-동작하나)에, 리더보드용 "초파리 5마리 투표"는 [하이브리드](#하이브리드-미세조정-코--버섯체-flyguardhybridpy)에 있어요. 그림은 `python -m flyguard.diagram`으로 다시 그릴 수 있어요.
+
 ## 빠른 시작
 Python 3.12 기준이에요. PyTorch(가능하면 CUDA 버전)를 먼저 설치한 뒤 나머지를 설치하세요.
 ```bash
@@ -104,10 +108,7 @@ pip install -r requirements.txt
 ## 어떻게 동작하나
 무엇을 학습했고 과적합은 없는지는 [docs/training.md](docs/training.md)에 자세히 정리했어요.
 
-```
-텍스트 ─인코더─▶ 임베딩 ─안테나엽─▶ 사구체 55개 발화율 ─PN→KC 배선─▶ 케년세포 2,329개
-       ─APL 억제(상위 5%만 발화)─▶ 희소 코드 ─도파민이 조절한 시냅스─▶ MBON 접근 / 회피 ─▶ 전달 / 격리
-```
+흐름은 맨 위 그림과 같아요. 그림의 각 단계가 실제 초파리의 어느 부분을 본떴는지는 아래 표에 있어요.
 | 초파리 | FlyGuard (`flyguard/mushroom_body.py`) |
 |---|---|
 | 후각 수용체 뉴런 | 문장 인코더(MiniLM) |
@@ -122,6 +123,8 @@ pip install -r requirements.txt
 - **validation에서 고르는 값:** 도파민 양 β, 임계값 θ, 시냅스 가중치 변환, 항상성 사용 여부.
 
 ### 하이브리드: 미세조정 코 + 버섯체 (`flyguard/hybrid.py`)
+![리더보드 모델: train을 5조각으로 나눠 코 5개를 미세조정하고, 초파리 5마리가 각자 자기 코가 못 본 조각으로만 배운 뒤, 새 문장에서 확률을 평균해 판정하는 과정](docs/figures/architecture_hybrid.png)
+
 코(인코더)를 미세조정하면 그 인코더는 학습한 문장을 지나치게 잘 구별해요. 같은 문장으로 버섯체의 KC 발화 횟수를 세면 도파민 가중치가 과신하게 돼요. 이를 막으려고 교차 적합을 씁니다.
 1. train 문장을 5개 폴드로 나눠요.
 2. 폴드 k의 인코더는 나머지 4개 폴드로 미세조정해요.
@@ -191,6 +194,7 @@ flyguard/            파이썬 패키지
   fly_analysis.py    초파리 판독기: 적은 라벨, 새로움 신호와 계단식 판정, 한국어 온라인 학습
   intervene.py       개입 실험: "낯선 글자 = 공격" 지름길을 train에서 끊고 다시 확인
   figures.py         docs/analysis.md의 그림
+  diagram.py         README의 모델 구조 그림(초파리 한 마리의 회로, 5마리 투표)
 server/app.py        FastAPI(/api/classify, /api/noses, /api/brain, /api/samples, /api/batch, /api/videos)
 web/                 Three.js 데모: 분류 작업대(js/stage.js), 관절 초파리(js/fly.js), HUD, 회로 패널, T자 미로 배치 모드
 sim/                 NeuroMechFly 두 프롬프트 선택 영상 렌더(flygym 환경)
