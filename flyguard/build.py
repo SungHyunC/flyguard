@@ -28,7 +28,7 @@ from .hybrid import OUT as HYBRID_OUT
 from .hybrid import HybridGuard, available
 from .metrics import binary_metrics
 from .mushroom_body import AntennalLobe, FlyGuard, FlyMushroomBody
-from .paths import ARTIFACTS, DEMO, WEB, ensure_dirs
+from .paths import ARTIFACTS, DEMO, DEMO_E5, WEB, ensure_dirs
 
 FLYWIRE_WIRING = ARTIFACTS / "flywire" / "wiring.npz"
 
@@ -95,12 +95,36 @@ def curate(val, n_each: int = 12, seed: int = 0) -> list[dict]:
     return [{"text": t, "label": y, "tag": tag} for t, y, tag in items]
 
 
+def build_e5_nose(seed: int = 0) -> None:
+    """A second demo fly with the multilingual e5 nose and the same brain (the demo fly's wiring and settings),
+    saved to artifacts/demo_e5. Run after the main build; the server offers it as another nose."""
+    from .encoders import E5Encoder
+    d = load_splits()
+    enc = E5Encoder()
+    E = {s: cached(enc, s, d[s].text) for s in ("train", "validation")}
+    demo = FlyGuard.load(DEMO, None)
+    lobe = AntennalLobe(demo.lobe.n_glom, seed).fit(E["train"])
+    P = {s: lobe.transform(E[s]) for s in E}
+    mb = FlyMushroomBody(demo.mb.wiring, sparsity=demo.mb.sparsity, homeostasis=demo.mb.homeostasis)
+    mb.fit(P["train"], d["train"].label).calibrate(P["validation"], d["validation"].label)
+    val_acc = float(np.mean(mb.predict(P["validation"]) == d["validation"].label.to_numpy()))
+    FlyGuard(enc, lobe, mb).save(DEMO_E5)
+    (DEMO_E5 / "nose.json").write_text(json.dumps({"label": "고정 다국어 e5 코", "val_acc": val_acc}, ensure_ascii=False),
+                                       encoding="utf-8")
+    print(f"saved the e5-nosed fly to {DEMO_E5} | val acc={val_acc:.3f}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--wiring", choices=["auto", "random", "flywire"], default="auto")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--nose", choices=["minilm", "e5"], default="minilm",
+                    help="e5: only build the extra demo fly with the multilingual e5 nose (artifacts/demo_e5)")
     args = ap.parse_args()
     ensure_dirs()
+    if args.nose == "e5":
+        build_e5_nose(args.seed)
+        return
 
     d = load_splits()
     tr, va = d["train"], d["validation"]

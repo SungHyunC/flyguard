@@ -8,6 +8,7 @@ pandas
 pyarrow
 scipy
 scikit-learn
+matplotlib
 joblib
 fastapi
 uvicorn
