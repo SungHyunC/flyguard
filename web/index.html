@@ -23,6 +23,7 @@
       <button data-tab="live" class="on">실시간</button>
       <button data-tab="batch">배치 모드</button>
       <button data-tab="physics">물리 시뮬</button>
+      <button data-tab="lab">지름길 실험실</button>
       <button id="theme" class="ghost">밝은 화면</button>
     </nav>
   </header>
@@ -136,6 +137,17 @@
 
     <section id="maze-card" class="card maze-card" data-tabs="batch">
       <canvas id="maze" aria-label="T자 미로 끝에 쌓이는 판정 결과"></canvas>
+    </section>
+
+    <section id="lab-card" class="card" data-tabs="lab">
+      <h2>지름길 실험실: 무해한 글자 하나에 판정이 뒤집히나</h2>
+      <p class="muted">S-Labs train에서 ASCII가 아닌 글자가 든 문장 22개는 전부 공격이에요. 그래서 미세조정 모델은 "낯선 글자 = 공격"이라는 지름길을 배웠어요. 정상 문장에 무해한 글자만 붙여 보고, 글자 보강 train으로 다시 학습한 모델과 나란히 비교해요.</p>
+      <div class="row tight">
+        <input id="lab-text" type="text" value="How do I center a div in CSS?" aria-label="실험할 문장">
+        <button id="lab-go" class="primary">실험하기</button>
+      </div>
+      <div id="lab-examples" class="lab-examples"></div>
+      <div id="lab-result"><p class="muted small">문장을 넣고 실험하기를 누르면, 글자만 바꾼 변형들의 판정이 표로 나와요.</p></div>
     </section>
 
     <section id="physics-card" class="card" data-tabs="physics">

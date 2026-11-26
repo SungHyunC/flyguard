@@ -6,6 +6,9 @@ import { Stage } from './stage.js';
 
 const $ = (sel) => document.querySelector(sel);
 const pct = (p) => `${Math.round(p * 100)}%`;
+// Small probabilities (an LLM's calibrated threshold can be 1e-8) stay readable instead of showing "0%".
+const prob = (p) => (p >= 0.01 || p === 0 ? pct(p) : p >= 1e-4 ? `${(p * 100).toFixed(2)}%` : `${p.toExponential(1)}`);
+const finalVote = (res) => res.final || res.vote;   // the cascade's verdict when the server sends one
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const LABEL = { benign: '정상', injection: '인젝션' };
 const TAGS = {
@@ -144,7 +147,21 @@ function setVerdict(vote) {
   }
   const inj = vote.decision === 'injection';
   el.className = `chip ${inj ? 'block' : 'pass'}`;
-  el.textContent = `${inj ? '격리 · 인젝션' : 'LLM으로 전달 · 정상'} ${pct(vote.p)}`;
+  el.textContent = vote.by === 'llm'
+    ? `${inj ? '격리 · 인젝션' : 'LLM으로 전달 · 정상'} · 큰 모델 판정`
+    : `${inj ? '격리 · 인젝션' : 'LLM으로 전달 · 정상'} ${pct(vote.p)}`;
+}
+
+function routeLine(r) {
+  if (!r) return '';
+  const dist = `가장 가까운 학습 문장까지 거리 ${r.distance.toFixed(2)}, 기준 ${r.tau.toFixed(2)}`;
+  if (r.kind === 'fly') return `<p class="route fly"><b>익숙한 냄새</b> (${dist}) → 초파리가 판정했어요.</p>`;
+  if (r.kind === 'unfamiliar') {
+    return `<p class="route unfamiliar"><b>낯선 냄새</b> (${dist}) → 큰 모델이 꺼져 있어 초파리가 판정했어요.</p>`;
+  }
+  const q = r.llm;
+  return `<p class="route llm"><b>낯선 냄새</b> (${dist}) → ${esc(q.name)}에게 물어봤어요: <b>${LABEL[q.decision]}</b>
+    (Yes 확률 ${prob(q.p)}, S-Labs validation으로 정한 기준 ${prob(q.threshold)}). 초파리 대신 이 판정을 따랐어요.</p>`;
 }
 
 function onInspect(item, res) {
@@ -154,13 +171,15 @@ function onInspect(item, res) {
   raster.burst(res.fly.kc_active);
   $('#hud-active').textContent = res.fly.kc_active.length;
   $('#hud-text').textContent = item.text;
-  $('#hud-tag').textContent = item.tag || '';
+  const asking = res.route?.kind === 'llm' ? ' · 낯선 냄새, 큰 모델에 물어보는 중' : '';
+  $('#hud-tag').textContent = `${item.tag || ''}${asking}`;
   setVerdict(null);
 }
 
 function onSorted(item, res) {
   const s = stream.stats;
-  const inj = res.vote.decision === 'injection';
+  const final = finalVote(res);
+  const inj = final.decision === 'injection';
   s.n++;
   s[inj ? 'block' : 'pass']++;
   if (item.label != null) {
@@ -171,7 +190,8 @@ function onSorted(item, res) {
   const row = document.createElement('li');
   const ok = item.label == null ? null : (item.label === 1) === inj;
   row.className = ok == null ? '' : ok ? 'ok' : 'bad';
-  row.textContent = `${inj ? '격리' : '전달'} ${pct(res.vote.p)}${ok == null ? '' : ok ? ' ✓' : ' ✗'} · ${item.text}`;
+  const who = final.by === 'llm' ? ' (큰 모델)' : ` ${pct(final.p)}`;
+  row.textContent = `${inj ? '격리' : '전달'}${who}${ok == null ? '' : ok ? ' ✓' : ' ✗'} · ${item.text}`;
   const ticker = $('#live-ticker');
   ticker.prepend(row);
   if (ticker.childElementCount > 7) ticker.lastElementChild.remove();
@@ -185,12 +205,17 @@ function selectFly(i) {
 }
 
 function showResult() {
-  const { flies, vote, comparator } = state.last;
+  const { flies, vote, comparator, route } = state.last;
   const item = state.item;
   const fly = flies[state.selected];
-  const inj = vote.decision === 'injection';
+  const final = finalVote(state.last);
+  const inj = final.decision === 'injection';
   const many = flies.length > 1;
-  const agree = comparator.decision === vote.decision;
+  const agree = comparator.decision === final.decision;
+  const flyInj = vote.decision === 'injection';
+  const flySays = final.by === 'llm'
+    ? `초파리 판단은 ${flyInj ? '격리' : '전달'} ${pct(vote.p)}였어요 · `
+    : '';
   let truth = '';
   if (item?.label != null) {
     const correct = (item.label === 1) === inj;
@@ -204,8 +229,9 @@ function showResult() {
     <p class="muted small">방금 판단한 프롬프트</p>
     <p class="now-text">${esc(item.text)}</p>
     <div class="verdict ${inj ? 'block' : 'pass'}">${inj ? '격리' : 'LLM으로 전달'}
-      <small>${many ? `폴드 ${flies.length}개 투표 · 격리 ${vote.injection} / 전달 ${vote.benign} · 평균 인젝션 확률 ${pct(vote.p)}`
-                    : `인젝션 확률 ${pct(vote.p)}`}</small></div>
+      <small>${flySays}${many ? `폴드 ${flies.length}개 투표 · 격리 ${vote.injection} / 전달 ${vote.benign} · 평균 인젝션 확률 ${pct(vote.p)}`
+                    : `초파리 인젝션 확률 ${pct(vote.p)}`}</small></div>
+    ${routeLine(route)}
     ${votes}
     <dl class="facts">
       ${many ? `<div class="wide"><dt>뇌 패널에 보이는 회로</dt><dd>폴드 ${state.selected + 1} (번호를 누르면 바뀌어요)</dd></div>` : ''}
@@ -321,6 +347,57 @@ async function loadVideos() {
   }
 }
 
+// --- shortcut lab ------------------------------------------------------------------------------
+function renderLabExamples() {
+  const box = $('#lab-examples');
+  box.replaceChildren();
+  const benign = state.samples.filter((s) => s.label === 0 && s.tag !== 'hard-negative').slice(0, 4);
+  const attack = state.samples.filter((s) => s.label === 1).slice(0, 1);
+  for (const s of [...benign, ...attack]) {
+    const b = document.createElement('button');
+    b.className = 'ghost';
+    b.title = s.text;
+    b.textContent = `${s.label ? '공격' : '정상'} · ${s.text.length > 48 ? `${s.text.slice(0, 46)}…` : s.text}`;
+    b.addEventListener('click', () => {
+      $('#lab-text').value = s.text;
+      runLab();
+    });
+    box.append(b);
+  }
+}
+
+async function runLab() {
+  const text = $('#lab-text').value.trim();
+  const out = $('#lab-result');
+  if (!text) return;
+  if (state.offline) {
+    out.innerHTML = '<p class="warn">지름길 실험실은 서버가 켜져 있을 때만 동작해요.</p>';
+    return;
+  }
+  out.classList.add('pending');
+  try {
+    const res = await api('/api/lab', { text });
+    const base = res.rows[0].scores;
+    const cell = (s, orig) => {
+      const inj = s.decision === 'injection';
+      const flip = s.decision !== orig.decision;
+      return `<div class="lab-cell ${inj ? 'block' : 'pass'}"><b>${inj ? '막음' : '통과'} ${pct(s.p)}</b>
+        <div class="lab-bar"><i style="width:${Math.max(2, Math.round(s.p * 100))}%"></i></div>
+        ${flip ? '<span class="flip">원문과 판정이 달라졌어요</span>' : ''}</div>`;
+    };
+    const rows = res.rows.map((r) => `<tr><td class="variant">${esc(r.variant)}<small>${esc(r.text)}</small></td>${
+      res.models.map((m) => `<td>${cell(r.scores[m.id], base[m.id])}</td>`).join('')}</tr>`).join('');
+    out.innerHTML = `<table class="lab-table"><thead><tr><th>글자만 바꾼 변형</th>${
+      res.models.map((m) => `<th>${esc(m.label)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>
+      <p class="muted lab-note">"막음"은 인젝션으로 판정했다는 뜻이에요. 내용은 그대로이니, 정상 문장이 막히면 글자 모양에 속은 거예요.
+      키릴 글자로 바꾼 변형은 S-Labs train의 공격 기법 그대로라 막는 게 배운 대로예요.</p>`;
+  } catch (err) {
+    out.innerHTML = `<p class="warn">${esc(err.message)}</p>`;
+  } finally {
+    out.classList.remove('pending');
+  }
+}
+
 function setTab(tab) {
   document.body.dataset.tab = tab;
   document.querySelectorAll('.tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
@@ -355,7 +432,7 @@ async function boot() {
   stage.on = {
     inspect: onInspect, sorted: onSorted,
     decide: (item, res) => {   // reveal the verdict only when the fly acts on it
-      setVerdict(res.vote);
+      setVerdict(finalVote(res));
       showResult();
     },
     frame: (dt) => {
@@ -384,6 +461,11 @@ async function boot() {
   });
   $('#sample-filter').addEventListener('change', renderChips);
   $('#batch-go').addEventListener('click', startBatch);
+  renderLabExamples();
+  $('#lab-go').addEventListener('click', runLab);
+  $('#lab-text').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runLab();
+  });
   $('#theme').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
   document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
   setInterval(feed, 400);

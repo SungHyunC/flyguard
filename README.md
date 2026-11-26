@@ -72,6 +72,13 @@ pip install -r requirements.txt
 - **초파리의 코**
   - **미세조정 ModernBERT 코:** 하이브리드를 학습했다면 기본값이에요. 폴드 5개의 판정을 평균해요.
   - **고정 MiniLM 코:** 가볍고 빠른 초기 버전이에요.
+  - **고정 다국어 e5 코:** 같은 뇌에 한국어를 읽는 코를 단 초파리예요. `python -m flyguard.build --nose e5`로 만들면 나타나요.
+- **낯선 냄새는 큰 모델에게 (계단식 판정)**
+  - 가장 가까운 S-Labs 학습 문장과 거리가 먼 문장(S-Labs validation 기준 상위 10%)은 Qwen3-4B에게 물어보고, 그 판정을 따라요.
+  - 이때 초파리는 더 오래 냄새를 맡고, 결과 카드에 어느 쪽이 판정했는지 나와요.
+  - Qwen3-4B는 GPU에 자리가 있을 때만(다른 모델을 올린 뒤 약 9.5GB 이상) 자동으로 올라가요. `FLYGUARD_LLM=on`으로 강제로 켜고, `off`로 끌 수 있어요.
+- **지름길 실험실:** 정상 문장에 "감사합니다.", 이모지, 키릴 글자 같은 무해한 글자만 붙여서 판정이 뒤집히는지 봐요.
+  - 원래 train으로 학습한 ModernBERT와 글자 보강 train으로 학습한 ModernBERT(`python -m flyguard.train_encoder --augment-scripts 0.2 --out artifacts/encoder_aug`)를 나란히 비교해요.
 - **배치 모드:** 선택한 코의 판정으로 test 문장(`--final` 전에는 validation)을 미로 끝에 쌓아요. 점 색은 정답이에요.
 - **물리 시뮬:** NeuroMechFly 초파리가 두 프롬프트 중 정상 쪽 냄새원으로 걸어가는 영상 5개를 설명과 함께 보여줘요. 영상을 새로 만드는 법은 [sim/README.md](sim/README.md)에 있어요(별도 conda 환경 `flygym`).
 - **발표장 대비**
@@ -84,6 +91,7 @@ pip install -r requirements.txt
 | **하이브리드: 미세조정 ModernBERT 코 + 버섯체 (초파리 5마리 투표)** | **0.974** | 0.974 |
 | 미세조정 ModernBERT 코 + 선형 판독 (교차 적합) | 0.976 | 0.976 |
 | ModernBERT 5-fold 앙상블 (분류 헤드 평균) | 0.976 | 0.976 |
+| 하이브리드: 미세조정 다국어 e5 코 + 버섯체 (11월 추가, 외부 데이터에서 가장 강함) | 0.975 | 0.975 |
 | 하이브리드: 미세조정 MiniLM 코 + 버섯체 | 0.967 | 0.966 |
 | ModernBERT-base 미세조정 1개 (트랙 A) | 0.962 | 0.962 |
 | TF-IDF(단어+문자) + 로지스틱 회귀 | 0.961 | 0.960 |
@@ -134,7 +142,9 @@ pip install -r requirements.txt
 > - S-Labs 순위로 밖의 순위를 예측할 수 없어요(순위 상관 ρ = 0.25).
 > - 밖에서는 학습하지 않은 Qwen3-4B가 가장 강했어요(76.7%).
 > - ModernBERT 계열 미세조정 모델은 "낯선 글자 = 공격"이라는 지름길을 배워 한국어 정상 문장을 94% 막아요.
-> - 밖의 성능은 튜닝 방법보다 인코더가 정해요. 다국어 e5가 영어 인코더보다 약 8%p 높았어요.
+> - 밖의 성능은 튜닝 방법보다 인코더가 정해요. 다국어 e5가 영어 인코더보다 약 7%p 높았어요.
+> - 다국어 e5 하이브리드는 S-Labs test 97.5%로 ModernBERT 하이브리드와 같고, 밖에서는 72.0%로 S-Labs로 학습한 모델 중 가장 높아요.
+> - 한국어 문장 1,343개(S-Labs train 번역 + 일상 요청, `flyguard/korean_aug.py`)로 보강하면 ModernBERT도 한국어 52.7% → 79.0%, 외부 평균 67.5% → 70.8%로 올라요. S-Labs test는 96.6%로 그대로예요.
 
 - **좋은 코를 주면 초파리 판정이 최적 판독과 거의 같아져요.**
   - 고정 MiniLM 코에서는 버섯체가 선형 판독보다 2.5%p 낮았어요(0.916 vs 0.941).
@@ -190,8 +200,12 @@ flyguard/            파이썬 패키지
   shortcuts.py       판정 근거: 글자 반사실 실험, 단어 지우기, 긴 문서 위치 실험, 확률 보정
   fly_analysis.py    초파리 판독기: 적은 라벨, 새로움 신호와 계단식 판정, 한국어 온라인 학습
   intervene.py       개입 실험: "낯선 글자 = 공격" 지름길을 train에서 끊고 다시 확인
+  augment.py         글자 보강(다른 문자의 인사말을 정상·공격에 똑같이 붙임), train_encoder --augment-scripts
+  korean_aug.py      평가에 안 쓰는 한국어 학습 데이터 만들기(S-Labs train 번역 + 일상 요청 생성, Qwen3-4B)
+  long_docs.py       긴 문서: 잘림 대 희석, 다른 출처로 맞춘 창 기준선
+  source_holdout.py  출처 홀드아웃: 한 종류의 외부 묶음을 빼고 나머지 출처를 더 배우면 그 종류에서 나아지나
   figures.py         docs/analysis.md의 그림
-server/app.py        FastAPI(/api/classify, /api/noses, /api/brain, /api/samples, /api/batch, /api/videos)
+server/app.py        FastAPI(/api/classify, /api/lab, /api/cascade, /api/noses, /api/brain, /api/samples, /api/batch, /api/videos)
 web/                 Three.js 데모: 분류 작업대(js/stage.js), 관절 초파리(js/fly.js), HUD, 회로 패널, T자 미로 배치 모드
 sim/                 NeuroMechFly 두 프롬프트 선택 영상 렌더(flygym 환경)
 reports/             results.md, results.json, runs.jsonl, 학습 로그

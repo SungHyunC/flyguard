@@ -372,7 +372,7 @@ export class Stage {
     } else if (c.phase === 'sniff') {
       c.group.position.y = HOLD.y + 0.02 * Math.sin(this.time * 9);
       if (c.t >= c.decide) {
-        const benign = c.res.vote.decision === 'benign';
+        const benign = (c.res.final || c.res.vote).decision === 'benign';   // the cascade's verdict when there is one
         c.rim.material.color.copy(glow(benign ? NEON.green : NEON.red, 2.6));
         Object.assign(c, { phase: benign ? 'push' : 'windup', t: 0 });
         this.on.decide(c.item, c.res);
@@ -442,6 +442,7 @@ export class Stage {
       const c = this.belt.shift();
       const margin = Math.abs(c.res.fly.margin);
       c.decide = clamp(0.45 + 0.3 / Math.max(margin, 0.15), 0.55, 1.8);   // hesitate on hard prompts
+      if (c.res.route?.kind === 'llm') c.decide = 2.4;                    // an unfamiliar smell: wait for the big model
       Object.assign(c, { phase: 'catch', t: 0, from: c.group.position.clone() });
       this.current = c;
     }

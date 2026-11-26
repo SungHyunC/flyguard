@@ -27,6 +27,34 @@
   "latency_ms": 17.5,
   "seconds": 62
  },
+ "ModernBERT 미세조정 1개 (글자 보강)": {
+  "family": "미세조정",
+  "threshold": 0.30339933235441735,
+  "threshold_fpr1": 0.6164741516113281,
+  "latency_ms": 65.2,
+  "seconds": 165
+ },
+ "ModernBERT 미세조정 1개 (한국어 보강)": {
+  "family": "미세조정",
+  "threshold": 0.5154981470886798,
+  "threshold_fpr1": 0.9979810118675232,
+  "latency_ms": 17.1,
+  "seconds": 64
+ },
+ "다국어 e5 미세조정 1개": {
+  "family": "미세조정",
+  "threshold": 0.016618562356835974,
+  "threshold_fpr1": 0.027585284784436226,
+  "latency_ms": 10.2,
+  "seconds": 27
+ },
+ "다국어 e5 미세조정 1개 (한국어 보강)": {
+  "family": "미세조정",
+  "threshold": 0.02595735713839531,
+  "threshold_fpr1": 0.022977370768785477,
+  "latency_ms": 9.9,
+  "seconds": 27
+ },
  "하이브리드 ModernBERT · 초파리 투표": {
   "family": "초파리",
   "threshold": 0.5141636601944071,
@@ -54,6 +82,20 @@
   "threshold_fpr1": 0.61509770154953,
   "latency_ms": 38.1,
   "seconds": 52
+ },
+ "하이브리드 다국어 e5 · 초파리 투표": {
+  "family": "초파리",
+  "threshold": 0.32496030037127566,
+  "threshold_fpr1": 0.4320143461227417,
+  "latency_ms": 68.8,
+  "seconds": 282
+ },
+ "하이브리드 다국어 e5 · 헤드 앙상블": {
+  "family": "미세조정",
+  "threshold": 0.21072661876678467,
+  "threshold_fpr1": 0.27872171998023987,
+  "latency_ms": 74.6,
+  "seconds": 328
  },
  "ProtectAI DeBERTa v2 (외부 전문 탐지기)": {
   "family": "외부",

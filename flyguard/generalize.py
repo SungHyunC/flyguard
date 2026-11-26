@@ -31,6 +31,7 @@ from .paths import ARTIFACTS, DEMO, REPORTS
 
 OUT = REPORTS / "generalization"
 LLM_PER_SUITE = 400               # the LLM judge is slow: a fixed random sample per suite
+LLM_CHUNK = 1024                  # LLM scores are saved after every chunk (partial_*.npy) so a stopped run can resume
 PROTECTAI = "protectai/deberta-v3-base-prompt-injection-v2"
 QWEN = "Qwen/Qwen2.5-1.5B-Instruct"
 QWEN3 = "Qwen/Qwen3-4B-Instruct-2507"
@@ -93,14 +94,30 @@ def llm_scorer(name: str, examples: list[tuple[str, str]] | None = None):
                + tok.decode(ids) + "\n\"\"\"\n\nIs this a prompt injection or jailbreak?")
         return tok.apply_chat_template([{"role": "user", "content": msg}], tokenize=False, add_generation_prompt=True)
 
-    def score(texts, batch=32):
-        out = []
+    def score(texts, max_batch=32, token_budget=8192):
+        # Batches of similar length, at most `token_budget` padded tokens each: a long instruction (definition
+        # prompting) at a fixed batch of 32 overflowed 16 GB, and Windows then pages GPU memory to system RAM.
+        prompts = [prompt(t) for t in texts]
+        lengths = [len(tok.encode(q, add_special_tokens=False)) for q in prompts]
+        order = np.argsort(lengths, kind="stable")
+        out = np.empty(len(prompts))
+        # every batch has a new shape, so cached blocks pile up; on Windows the overflow is paged to system RAM
+        # instead of failing, and scoring slows to a crawl. Hand cached blocks back before that happens.
+        limit = 0.75 * torch.cuda.get_device_properties(device).total_memory if device.type == "cuda" else None
         with torch.no_grad():
-            for i in range(0, len(texts), batch):
-                enc = tok([prompt(t) for t in texts[i:i + batch]], return_tensors="pt", padding=True).to(device)
+            i = 0
+            while i < len(order):
+                j = i + 1
+                while j < len(order) and j - i < max_batch and (j - i + 1) * lengths[order[j]] <= token_budget:
+                    j += 1
+                idx = order[i:j]
+                enc = tok([prompts[k] for k in idx], return_tensors="pt", padding=True).to(device)
                 logits = model(**enc, logits_to_keep=1, use_cache=False).logits[:, -1, [yes, no]].float()   # last position only
-                out.append(torch.softmax(logits, -1)[:, 0].cpu().numpy())
-        return np.concatenate(out)
+                out[idx] = torch.softmax(logits, -1)[:, 0].cpu().numpy()
+                i = j
+                if limit and torch.cuda.memory_reserved(device) > limit:
+                    torch.cuda.empty_cache()
+        return out
 
     return lambda texts: score(list(texts))
 
@@ -143,14 +160,29 @@ def scorers(d):
         label = hybrid_label(name)
         out.append((f"하이브리드 {label} · 초파리 투표", "초파리", hybrid(name, "fly")))
         out.append((f"하이브리드 {label} · 헤드 앙상블", "미세조정", hybrid(name, "head")))
-    if (ARTIFACTS / "encoder_aug" / "meta.json").exists():          # train_encoder --augment-scripts 0.2
-        out.insert(4, ("ModernBERT 미세조정 1개 (글자 보강)", "미세조정",
-                       lambda: (lambda e: (lambda texts: e.predict_proba(list(texts))))(FineTunedEncoder(ARTIFACTS / "encoder_aug"))))
+    for i, (folder, label) in enumerate(EXTRA_ENCODERS.items()):    # train_encoder --out artifacts/<folder>
+        if (ARTIFACTS / folder / "meta.json").exists():
+            out.insert(4 + i, (label, "미세조정", single_encoder(ARTIFACTS / folder)))
     out.append(("ProtectAI DeBERTa v2 (외부 전문 탐지기)", "외부", protectai_scorer))
     out.append(("Qwen2.5-1.5B 제로샷 (거대언어모델)", "외부", lambda: llm_scorer(QWEN)))
     out.append(("Qwen3-4B 제로샷 (거대언어모델)", "외부", lambda: llm_scorer(QWEN3)))
     out.append(("Qwen3-4B 정의·예시 8개 (거대언어모델)", "외부", lambda: llm_scorer(QWEN3, few_shot_examples(tr))))
     return out
+
+
+EXTRA_ENCODERS = {      # extra single fine-tuned encoders, scored when their folder exists
+    "encoder_aug": "ModernBERT 미세조정 1개 (글자 보강)",
+    "encoder_ko": "ModernBERT 미세조정 1개 (한국어 보강)",
+    "encoder_e5": "다국어 e5 미세조정 1개",
+    "encoder_e5_ko": "다국어 e5 미세조정 1개 (한국어 보강)",
+}
+
+
+def single_encoder(path):
+    def make():
+        enc = FineTunedEncoder(path)
+        return lambda texts: enc.predict_proba(list(texts))
+    return make
 
 
 def hybrid_label(folder: str) -> str:
@@ -163,7 +195,49 @@ def slug(name: str) -> str:
     return hashlib.sha1(name.encode()).hexdigest()[:10]
 
 
-def run() -> None:
+def single_latency(score, d) -> float:
+    """ms per prompt, one prompt at a time, the way a live filter sees traffic (after one warm-up call)."""
+    sample = d["test"].text.sample(64, random_state=0).tolist()
+    score(sample[:1])
+    t1 = time.time()
+    for t in sample:
+        score([t])
+    return (time.time() - t1) / len(sample) * 1000
+
+
+def remeasure_latency(names) -> None:
+    """Measure latency again for models scored while the GPU was shared, and update their saved meta."""
+    d = load_splits()
+    models = json.loads((OUT / "models.json").read_text(encoding="utf-8"))
+    for name, _, make in scorers(d):
+        if name not in names or name not in models:
+            continue
+        score = make()
+        models[name]["latency_ms"] = round(single_latency(score, d), 1)
+        (OUT / f"meta_{slug(name)}.json").write_text(json.dumps(models[name], ensure_ascii=False), encoding="utf-8")
+        print(f"{name}: {models[name]['latency_ms']} ms", flush=True)
+        del score
+        torch.cuda.empty_cache()
+    (OUT / "models.json").write_text(json.dumps(models, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def score_resumable(score, texts, partial, name, chunk: int = LLM_CHUNK) -> np.ndarray:
+    """LLM scores in chunks, saved after each one, so a stopped run picks up where it left off."""
+    done = np.load(partial) if partial.exists() else np.full(len(texts), np.nan, dtype=np.float32)
+    if len(done) != len(texts):
+        done = np.full(len(texts), np.nan, dtype=np.float32)
+    todo = np.flatnonzero(np.isnan(done))
+    if len(todo) < len(texts):
+        print(f"  resume {name}: {len(texts) - len(todo)}/{len(texts)} already scored", flush=True)
+    for k in range(0, len(todo), chunk):
+        part = todo[k:k + chunk]
+        done[part] = score([texts[i] for i in part])
+        np.save(partial, done)
+        print(f"  {name}: {len(texts) - len(todo) + k + len(part)}/{len(texts)}", flush=True)
+    return done
+
+
+def run(skip_llm: bool = False) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     d = load_splits()
     ext = load_suites()
@@ -178,7 +252,7 @@ def run() -> None:
     digest = hashlib.sha1("\n".join(ids.text).encode("utf-8")).hexdigest()[:16]
     stamp = OUT / "rows.sha1"
     if stamp.exists() and stamp.read_text().strip() != digest:
-        for f in list(OUT.glob("scores_*.npy")) + list(OUT.glob("meta_*.json")):
+        for f in list(OUT.glob("scores_*.npy")) + list(OUT.glob("meta_*.json")) + list(OUT.glob("partial_*.npy")):
             f.unlink()
         print("rows changed: cleared cached scores", flush=True)
     stamp.write_text(digest)
@@ -189,7 +263,11 @@ def run() -> None:
     meta = {}
     for name, family, make in scorers(d):
         path = OUT / f"scores_{slug(name)}.npy"
-        rows = np.sort(llm_rows) if "제로샷" in name else np.arange(len(ids))
+        is_llm = "거대언어모델" in name
+        rows = np.sort(llm_rows) if is_llm else np.arange(len(ids))
+        if is_llm and skip_llm and not path.exists():
+            print(f"skip (LLM, --skip-llm) {name}", flush=True)
+            continue
         if path.exists():
             print(f"skip (cached) {name}", flush=True)
             meta[name] = json.loads((OUT / f"meta_{slug(name)}.json").read_text(encoding="utf-8"))
@@ -197,16 +275,15 @@ def run() -> None:
         t0 = time.time()
         score = make()
         texts = ids.text.iloc[rows].tolist()
-        s = score(texts)
+        if is_llm:
+            s = score_resumable(score, texts, OUT / f"partial_{slug(name)}.npy", name)
+        else:
+            s = score(texts)
         full = np.full(len(ids), np.nan, dtype=np.float32)
         full[rows] = s
         np.save(path, full)
-        # latency: one prompt at a time, the way a live filter sees traffic
-        sample = d["test"].text.sample(64, random_state=0).tolist()
-        t1 = time.time()
-        for t in sample:
-            score([t])
-        latency_ms = (time.time() - t1) / len(sample) * 1000
+        (OUT / f"partial_{slug(name)}.npy").unlink(missing_ok=True)
+        latency_ms = single_latency(score, d)
         val = ids.suite == "slabs_validation"
         sv, yv = full[val.to_numpy()], ids.label[val].to_numpy()
         benign = np.sort(sv[yv == 0])
@@ -223,8 +300,12 @@ def run() -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--report", action="store_true", help="only rebuild the report from saved scores")
+    ap.add_argument("--skip-llm", action="store_true", help="leave out LLM judges that are not scored yet")
+    ap.add_argument("--latency", nargs="+", metavar="NAME", help="only measure latency again for these models")
     args = ap.parse_args()
-    if not args.report:
-        run()
+    if args.latency:
+        remeasure_latency(set(args.latency))
+    elif not args.report:
+        run(args.skip_llm)
     from .generalize_report import write_report
     write_report()
