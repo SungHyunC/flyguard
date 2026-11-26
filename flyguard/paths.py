@@ -8,6 +8,7 @@ CONNECTOME = DATA / "connectome"
 EXTERNAL = DATA / "external"           # evaluation-only datasets (flyguard.external)
 ARTIFACTS = ROOT / "artifacts"
 DEMO = ARTIFACTS / "demo"           # what the web demo loads (flyguard.build)
+DEMO_E5 = ARTIFACTS / "demo_e5"     # the extra demo fly with the multilingual e5 nose (build --nose e5)
 CACHE = ARTIFACTS / "cache"
 REPORTS = ROOT / "reports"
 WEB = ROOT / "web"

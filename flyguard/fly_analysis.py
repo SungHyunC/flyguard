@@ -53,7 +53,8 @@ FLY = "초파리 · 고정 MiniLM 코"
 MODERNBERT = "ModernBERT 미세조정 1개"
 EXPERTS = ["ProtectAI DeBERTa v2 (외부 전문 탐지기)", "Qwen2.5-1.5B 제로샷 (거대언어모델)", "Qwen3-4B 제로샷 (거대언어모델)"]
 BUDGETS = [0.0, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0]
-DEPLOY_BASES = ["ModernBERT 미세조정 1개", "하이브리드 MiniLM · 초파리 투표", "하이브리드 ModernBERT · 초파리 투표"]
+DEPLOY_BASES = ["ModernBERT 미세조정 1개", "하이브리드 MiniLM · 초파리 투표", "하이브리드 ModernBERT · 초파리 투표",
+                "하이브리드 다국어 e5 · 초파리 투표"]
 DEPLOY_EXPERTS = ["ProtectAI DeBERTa v2 (외부 전문 탐지기)", "Qwen3-4B 제로샷 (거대언어모델)"]
 DEPLOY_BUDGETS = [0.0, 0.1, 0.2, 0.3, 0.5, 1.0]
 READOUT_KO = {"fly": "초파리 버섯체 (도파민 계수)", "lr_glom": "로지스틱 회귀 · 같은 55개 사구체 입력",
@@ -273,6 +274,55 @@ def online_korean(d, wiring) -> list[dict]:
     return out
 
 
+# 4. a residual glomerulus ----------------------------------------------------------------------
+class ResidualLobe(AntennalLobe):
+    """The demo's antennal lobe with one glomerulus re-wired to carry what PCA throws away: the size of the
+    embedding's residual outside the kept principal directions, scaled to that glomerulus's usual rate."""
+
+    def __init__(self, base: AntennalLobe, slot: int, E_train: np.ndarray):
+        super().__init__(base.n_glom, base.seed)
+        self.mean, self.components, self.channel, self.slot = base.mean, base.components, base.channel, slot
+        usual = np.percentile(super().transform(E_train)[:, slot], 95)
+        self.scale = usual / max(np.percentile(self.residual(E_train), 95), 1e-9)
+
+    def residual(self, E: np.ndarray) -> np.ndarray:
+        c = E - self.mean
+        z = c @ self.components.T
+        return np.sqrt(np.maximum((c ** 2).sum(1) - (z ** 2).sum(1), 0))
+
+    def transform(self, E: np.ndarray) -> np.ndarray:
+        P = super().transform(E)
+        P[:, self.slot] = (self.residual(E) * self.scale).astype(np.float32)
+        return P
+
+
+def residual_channel(d, enc) -> dict:
+    """Does the novelty MBON see unfamiliar prompts once one glomerulus carries the PCA residual?
+    Same wiring, same settings, same training; only the input of the most widely connected glomerulus changes."""
+    rows = pd.read_parquet(GEN / "rows.parquet")
+    E = cached(enc, "generalization_rows", rows.text)
+    Es = {s: cached(enc, s, d[s].text) for s in ("train", "validation", "test")}
+    y = {s: d[s].label.to_numpy() for s in Es}
+    demo = FlyGuard.load(DEMO, enc)
+    slot = int(np.asarray(demo.mb.wiring.W.sum(0)).ravel().argmax())
+    suite, group = rows.suite.to_numpy(), rows.group.to_numpy()
+    test, ext = suite == "slabs_test", group != "id"
+    out = {"slot": slot, "slot_kcs": int(np.asarray((demo.mb.wiring.W[:, slot] > 0).sum()))}
+    for name, lobe in (("demo", demo.lobe), ("residual", ResidualLobe(demo.lobe, slot, Es["train"]))):
+        P = {s: lobe.transform(Es[s]) for s in Es}
+        mb = FlyMushroomBody(demo.mb.wiring, sparsity=demo.mb.sparsity, homeostasis=demo.mb.homeostasis)
+        mb.fit(P["train"], y["train"]).calibrate(P["validation"], y["validation"])
+        nov = mb.novelty(mb.kc_code(lobe.transform(E)))
+        out[name] = {
+            "test_acc": float(np.mean(mb.predict(P["test"]) == y["test"])),
+            "detect": {g: float(roc_auc_score(np.r_[np.zeros(test.sum()), np.ones((group == g).sum())],
+                                               np.r_[nov[test], nov[group == g]])) for g in pd.unique(group[ext])},
+        }
+        out[name]["detect_mean"] = float(np.mean(list(out[name]["detect"].values())))
+        print("residual channel", name, round(out[name]["test_acc"], 3), round(out[name]["detect_mean"], 3), flush=True)
+    return out
+
+
 # report ------------------------------------------------------------------------------------------
 def table(header, body):
     lines = ["| " + " | ".join(header) + " |", "|" + "---|" * len(header)]
@@ -398,6 +448,21 @@ def section_online(rows) -> str:
 """
 
 
+def section_residual(r) -> str:
+    gko = {"over_defense": "과잉 방어", "direct": "직접", "jailbreak": "탈옥", "agentic": "에이전트", "indirect": "간접",
+           "mixed": "혼합", "korean": "한국어"}
+    groups = list(r["demo"]["detect"])
+    body = [[label, pct(r[k]["test_acc"])] + [f"{r[k]['detect'][g]:.2f}" for g in groups] + [f"{r[k]['detect_mean']:.2f}"]
+            for k, label in (("demo", "지금 초파리 (PCA 방향만)"), ("residual", "버린 성분 사구체 추가"))]
+    tab = table(["안테나엽", "S-Labs test 정확도"] + [gko.get(g, g) for g in groups] + ["평균"], body)
+    return f"""## 4. 안테나엽에 "버린 성분" 사구체 넣기 (새로움 신호 AUC, S-Labs test 대비 각 외부 유형)
+- **바꾼 것:** 연결된 KC가 가장 많은 사구체 1개(KC {r['slot_kcs']}개와 연결)의 입력을, PCA가 버린 성분의 크기로 바꿨어요. 배선·학습 규칙·설정은 그대로예요.
+- **이유:** 새로운 문장은 PCA가 버린 방향에서 달라서, 지금 초파리의 새로움 신호(MBON)는 그 차이를 볼 수 없었어요.
+
+{tab}
+"""
+
+
 def write_report(res: dict) -> None:
     sections = []
     if "few_labels" in res:
@@ -406,6 +471,8 @@ def write_report(res: dict) -> None:
         sections.append(section_familiarity(res["familiarity"]))
     if "online_korean" in res:
         sections.append(section_online(res["online_korean"]))
+    if "residual" in res:
+        sections.append(section_residual(res["residual"]))
     report = ("# 초파리 판독기만의 성질: 적은 라벨, 낯섦 감지, 온라인 학습\n\n"
               "`python -m flyguard.fly_analysis`가 만들었어요. 정확도 경쟁이 아니라, 초파리 회로가 구조적으로 무엇을 다르게 할 수 있는지 재요.\n\n"
               + "\n".join(sections))
@@ -424,6 +491,8 @@ def run(parts) -> None:
         if "familiarity" in parts:
             res["familiarity"] = familiarity(d, enc)
         del enc
+    if "residual" in parts:
+        res["residual"] = residual_channel(d, MiniLMEncoder())
     if "online" in parts:
         res["online_korean"] = online_korean(d, wiring)
     OUT.write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")

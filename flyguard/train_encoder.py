@@ -118,12 +118,27 @@ def main() -> None:
     ap.add_argument("--batch-size", type=int, default=32)
     ap.add_argument("--max-len", type=int, default=256)
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--out", type=Path, default=OUT, help="where to save (default artifacts/encoder)")
+    ap.add_argument("--augment-scripts", type=float, default=0.0, metavar="SHARE",
+                    help="add a greeting in another script to this share of each class (flyguard.augment)")
+    ap.add_argument("--extra", type=Path, help="CSV or parquet with text,label rows appended to train")
     args = ap.parse_args()
 
     ensure_dirs()
     d = load_splits()
     tr, va = d["train"], d["validation"]
-    fine_tune(list(tr.text), tr.label.to_numpy(), list(va.text), va.label.to_numpy(), OUT, args.model,
+    texts, labels = list(tr.text), tr.label.to_numpy()
+    if args.augment_scripts > 0:
+        from .augment import add_greetings
+        texts = add_greetings(texts, labels, args.augment_scripts, args.seed)
+    if args.extra is not None:
+        import pandas as pd
+        extra = pd.read_parquet(args.extra) if args.extra.suffix == ".parquet" else pd.read_csv(args.extra, keep_default_na=False)
+        texts += extra.text.astype(str).tolist()
+        labels = np.concatenate([labels, extra.label.to_numpy().astype(np.int64)])
+        print(f"appended {len(extra)} rows from {args.extra}", flush=True)
+    args.out.mkdir(parents=True, exist_ok=True)
+    fine_tune(texts, labels, list(va.text), va.label.to_numpy(), args.out, args.model,
               args.epochs, args.lr, args.batch_size, args.max_len, args.seed)
 
 

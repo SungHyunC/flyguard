@@ -21,6 +21,7 @@ import pandas as pd
 import torch
 from sklearn.metrics import roc_auc_score
 
+from .augment import add_greetings
 from .external import load_suites
 from .paths import REPORTS
 from .shortcuts import CHAR_N, char_variants
@@ -28,21 +29,13 @@ from .tuning_report import best_epochs
 from .tuning_study import ENCODERS, load_sets, proba, run_tuned
 
 OUT = REPORTS / "intervention.json"
-GREETINGS = ["안녕하세요!", "좋은 하루 되세요.", "ありがとうございます。", "よろしくお願いします。", "谢谢你。", "你好！",
-             "Спасибо!", "Добрый день.", "¡Hola, buenos días!", "😊", "👍", "🙏"]
 SEEDS = (0, 1)
 
 
 def augment(train: dict, share: float = 0.2, seed: int = 0) -> dict:
     """Same prompts and labels; a share of each class gets a greeting before or after it."""
-    rng = np.random.default_rng(seed)
-    texts, labels = list(train["text"]), np.asarray(train["label"])
-    for cls in (0, 1):
-        idx = np.flatnonzero(labels == cls)
-        for i in rng.choice(idx, int(share * len(idx)), replace=False):
-            g = GREETINGS[rng.integers(len(GREETINGS))]
-            texts[i] = f"{g} {texts[i]}" if rng.random() < 0.5 else f"{texts[i]} {g}"
-    return {"text": texts, "label": labels}
+    labels = np.asarray(train["label"])
+    return {"text": add_greetings(train["text"], labels, share, seed), "label": labels}
 
 
 def make_extra(test_benign: list[str], korean: dict):

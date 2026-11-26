@@ -1992,6 +1992,102 @@
     "latency_ms": 25.5
    },
    {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.0,
+    "test_acc": 0.9752498810090433,
+    "external_ba": 0.719840902893229,
+    "korean_ba": 0.623247077023972,
+    "over_defense_ba": 0.762403368164504,
+    "escalated_test": 0.0,
+    "escalated_external": 0.0,
+    "latency_ms": 68.8
+   },
+   {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.1,
+    "test_acc": 0.9681104236078059,
+    "external_ba": 0.6897953194816324,
+    "korean_ba": 0.5566123622397962,
+    "over_defense_ba": 0.6936753432735238,
+    "escalated_test": 0.1489766777724893,
+    "escalated_external": 0.7580930155025838,
+    "latency_ms": 94.43137189531588,
+    "random": {
+     "test_acc": 0.9483103284150405,
+     "external_ba": 0.6832218977972314,
+     "korean_ba": 0.5745719389441952,
+     "over_defense_ba": 0.6679675160880151
+    }
+   },
+   {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.2,
+    "test_acc": 0.9623988576868158,
+    "external_ba": 0.6813134553410508,
+    "korean_ba": 0.5566123622397962,
+    "over_defense_ba": 0.6637630784622002,
+    "escalated_test": 0.27796287482151355,
+    "escalated_external": 0.8798466411068512,
+    "latency_ms": 97.53608934822469,
+    "random": {
+     "test_acc": 0.9432651118514993,
+     "external_ba": 0.67607128575885,
+     "korean_ba": 0.5664043740401332,
+     "over_defense_ba": 0.6490821453536034
+    }
+   },
+   {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.3,
+    "test_acc": 0.9552594002855783,
+    "external_ba": 0.675671383119858,
+    "korean_ba": 0.5563582971991458,
+    "over_defense_ba": 0.6456355775421574,
+    "escalated_test": 0.3940980485483103,
+    "escalated_external": 0.9353558926487748,
+    "latency_ms": 98.95157526254376,
+    "random": {
+     "test_acc": 0.9393622084721562,
+     "external_ba": 0.6731937030981225,
+     "korean_ba": 0.5630538348222288,
+     "over_defense_ba": 0.6406997126683132
+    }
+   },
+   {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.5,
+    "test_acc": 0.9457401237505949,
+    "external_ba": 0.6711642954775151,
+    "korean_ba": 0.5563582971991458,
+    "over_defense_ba": 0.6339887268967358,
+    "escalated_test": 0.6111375535459305,
+    "escalated_external": 0.9808968161360226,
+    "latency_ms": 100.11286881146857,
+    "random": {
+     "test_acc": 0.9369823893384103,
+     "external_ba": 0.6705162955436392,
+     "korean_ba": 0.5585770616450572,
+     "over_defense_ba": 0.634906365354801
+    }
+   },
+   {
+    "expert": "ProtectAI DeBERTa v2 (외부 전문 탐지기)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 1.0,
+    "test_acc": 0.9352689195621133,
+    "external_ba": 0.6681178331124423,
+    "korean_ba": 0.555850167117845,
+    "over_defense_ba": 0.6280338565836429,
+    "escalated_test": 1.0,
+    "escalated_external": 1.0,
+    "latency_ms": 25.5
+   },
+   {
     "expert": "Qwen3-4B 제로샷 (거대언어모델)",
     "base": "ModernBERT 미세조정 1개",
     "budget": 0.0,
@@ -2015,10 +2111,10 @@
     "escalated_external": 0.6876725678089979,
     "latency_ms": 101.91960370310215,
     "random": {
-     "test_acc": 0.9402189433603046,
-     "external_ba": 0.7253039097963626,
-     "korean_ba": 0.7010392393672447,
-     "over_defense_ba": 0.6994823008849559
+     "test_acc": 0.9408852927177535,
+     "external_ba": 0.7259781293365613,
+     "korean_ba": 0.6937928625556502,
+     "over_defense_ba": 0.6998323500491643
     }
    },
    {
@@ -2033,10 +2129,10 @@
     "escalated_external": 0.8468409939905799,
     "latency_ms": 120.00113691732987,
     "random": {
-     "test_acc": 0.9369823893384102,
-     "external_ba": 0.7413062509823559,
-     "korean_ba": 0.740084422657952,
-     "over_defense_ba": 0.6997217305801378
+     "test_acc": 0.9391718229414565,
+     "external_ba": 0.7361661504457375,
+     "korean_ba": 0.7369618499573741,
+     "over_defense_ba": 0.6979085545722714
     }
    },
    {
@@ -2051,10 +2147,10 @@
     "escalated_external": 0.9238265388988144,
     "latency_ms": 128.74669481890533,
     "random": {
-     "test_acc": 0.9333650642551167,
-     "external_ba": 0.7487565477606049,
-     "korean_ba": 0.7727863029269679,
-     "over_defense_ba": 0.6980781710914454
+     "test_acc": 0.9341266063779153,
+     "external_ba": 0.7472749403394812,
+     "korean_ba": 0.7789794685990339,
+     "over_defense_ba": 0.7006647000983285
     }
    },
    {
@@ -2069,10 +2165,10 @@
     "escalated_external": 0.9775864869254507,
     "latency_ms": 134.8538249147312,
     "random": {
-     "test_acc": 0.93146120894812,
-     "external_ba": 0.7570126549925683,
-     "korean_ba": 0.7975685564080706,
-     "over_defense_ba": 0.6995108161258604
+     "test_acc": 0.9305092812946217,
+     "external_ba": 0.7554347386986981,
+     "korean_ba": 0.8013080183764327,
+     "over_defense_ba": 0.6971376597836775
     }
    },
    {
@@ -2111,10 +2207,10 @@
     "escalated_external": 0.6876725678089979,
     "latency_ms": 118.01960370310215,
     "random": {
-     "test_acc": 0.9441218467396478,
-     "external_ba": 0.7273067732833354,
-     "korean_ba": 0.7177641612200436,
-     "over_defense_ba": 0.723952802359882
+     "test_acc": 0.944597810566397,
+     "external_ba": 0.7300396639439886,
+     "korean_ba": 0.7260269252628587,
+     "over_defense_ba": 0.723969518190757
     }
    },
    {
@@ -2129,10 +2225,10 @@
     "escalated_external": 0.8468409939905799,
     "latency_ms": 136.10113691732988,
     "random": {
-     "test_acc": 0.9390766301761067,
-     "external_ba": 0.7395676763758734,
-     "korean_ba": 0.7627340863881784,
-     "over_defense_ba": 0.7123721730580138
+     "test_acc": 0.939362208472156,
+     "external_ba": 0.741466973286818,
+     "korean_ba": 0.7613659183480156,
+     "over_defense_ba": 0.7100722713864307
     }
    },
    {
@@ -2147,10 +2243,10 @@
     "escalated_external": 0.9238265388988144,
     "latency_ms": 144.84669481890532,
     "random": {
-     "test_acc": 0.9349833412660639,
-     "external_ba": 0.7492441613934613,
-     "korean_ba": 0.7828458605664488,
-     "over_defense_ba": 0.7129449360865291
+     "test_acc": 0.9347929557353641,
+     "external_ba": 0.7477832692932957,
+     "korean_ba": 0.7840076489533011,
+     "over_defense_ba": 0.7038682399213372
     }
    },
    {
@@ -2165,10 +2261,10 @@
     "escalated_external": 0.9775864869254507,
     "latency_ms": 150.9538249147312,
     "random": {
-     "test_acc": 0.9289861970490243,
-     "external_ba": 0.7575757232055358,
-     "korean_ba": 0.8054256654352562,
-     "over_defense_ba": 0.7055511307767947
+     "test_acc": 0.930890052356021,
+     "external_ba": 0.7572237140929288,
+     "korean_ba": 0.8014926115373685,
+     "over_defense_ba": 0.7045511307767944
     }
    },
    {
@@ -2207,10 +2303,10 @@
     "escalated_external": 0.6876725678089979,
     "latency_ms": 196.51960370310215,
     "random": {
-     "test_acc": 0.947929557353641,
-     "external_ba": 0.7251538599718238,
-     "korean_ba": 0.6982929572795301,
-     "over_defense_ba": 0.7118225172074729
+     "test_acc": 0.9480247501189909,
+     "external_ba": 0.7235266750115376,
+     "korean_ba": 0.6986903239556692,
+     "over_defense_ba": 0.7138824975417897
     }
    },
    {
@@ -2225,10 +2321,10 @@
     "escalated_external": 0.8468409939905799,
     "latency_ms": 214.60113691732988,
     "random": {
-     "test_acc": 0.9389814374107568,
-     "external_ba": 0.7389122136370754,
-     "korean_ba": 0.7395693615610496,
-     "over_defense_ba": 0.7084351032448377
+     "test_acc": 0.9427891480247501,
+     "external_ba": 0.7395716487325046,
+     "korean_ba": 0.7446833854314672,
+     "over_defense_ba": 0.7092384464110129
     }
    },
    {
@@ -2243,10 +2339,10 @@
     "escalated_external": 0.9238265388988144,
     "latency_ms": 223.3466948189053,
     "random": {
-     "test_acc": 0.936030461684912,
-     "external_ba": 0.7482477787940722,
-     "korean_ba": 0.7679222316946103,
-     "over_defense_ba": 0.7061179941002951
+     "test_acc": 0.9360304616849119,
+     "external_ba": 0.7471511319250638,
+     "korean_ba": 0.7704442549966848,
+     "over_defense_ba": 0.7057114060963618
     }
    },
    {
@@ -2261,15 +2357,111 @@
     "escalated_external": 0.9775864869254507,
     "latency_ms": 229.45382491473117,
     "random": {
-     "test_acc": 0.9307948595906712,
-     "external_ba": 0.7570141009944134,
-     "korean_ba": 0.802024012503552,
-     "over_defense_ba": 0.7036976401179941
+     "test_acc": 0.9315564017134698,
+     "external_ba": 0.7556610872406091,
+     "korean_ba": 0.7982170597707683,
+     "over_defense_ba": 0.7056376597836774
     }
    },
    {
     "expert": "Qwen3-4B 제로샷 (거대언어모델)",
     "base": "하이브리드 ModernBERT · 초파리 투표",
+    "budget": 1.0,
+    "test_acc": 0.9262256068538791,
+    "external_ba": 0.7666129592139199,
+    "korean_ba": 0.8356937340153452,
+    "over_defense_ba": 0.6986037364798428,
+    "escalated_test": 1.0,
+    "escalated_external": 1.0,
+    "latency_ms": 113.6
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.0,
+    "test_acc": 0.9752498810090433,
+    "external_ba": 0.7163601590761728,
+    "korean_ba": 0.6285403050108933,
+    "over_defense_ba": 0.7503416912487708,
+    "escalated_test": 0.0,
+    "escalated_external": 0.0,
+    "latency_ms": 68.8
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.1,
+    "test_acc": 0.9681104236078059,
+    "external_ba": 0.7654940025647305,
+    "korean_ba": 0.8319083309652363,
+    "over_defense_ba": 0.6992059980334316,
+    "escalated_test": 0.1489766777724893,
+    "escalated_external": 0.6876725678089979,
+    "latency_ms": 153.21960370310217,
+    "random": {
+     "test_acc": 0.9505949547834364,
+     "external_ba": 0.7480431375317173,
+     "korean_ba": 0.7483236241356447,
+     "over_defense_ba": 0.7287689282202556
+    }
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.2,
+    "test_acc": 0.9623988576868158,
+    "external_ba": 0.76548993913543,
+    "korean_ba": 0.8333789192005304,
+    "over_defense_ba": 0.6865388397246805,
+    "escalated_test": 0.27796287482151355,
+    "escalated_external": 0.8468409939905799,
+    "latency_ms": 171.30113691732987,
+    "random": {
+     "test_acc": 0.9390766301761065,
+     "external_ba": 0.752893245185788,
+     "korean_ba": 0.7782518707966279,
+     "over_defense_ba": 0.7113918387413962
+    }
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.3,
+    "test_acc": 0.9524036173250833,
+    "external_ba": 0.7661027975084607,
+    "korean_ba": 0.8356937340153452,
+    "over_defense_ba": 0.6956710914454277,
+    "escalated_test": 0.3940980485483103,
+    "escalated_external": 0.9238265388988144,
+    "latency_ms": 180.0466948189053,
+    "random": {
+     "test_acc": 0.9352689195621133,
+     "external_ba": 0.7560203021443251,
+     "korean_ba": 0.7972822534811026,
+     "over_defense_ba": 0.7099847590953786
+    }
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
+    "budget": 0.5,
+    "test_acc": 0.9438362684435982,
+    "external_ba": 0.7675443585831987,
+    "korean_ba": 0.8356937340153452,
+    "over_defense_ba": 0.701937069813176,
+    "escalated_test": 0.6111375535459305,
+    "escalated_external": 0.9775864869254507,
+    "latency_ms": 186.1538249147312,
+    "random": {
+     "test_acc": 0.9324131366016182,
+     "external_ba": 0.7595261799653932,
+     "korean_ba": 0.8119757033248082,
+     "over_defense_ba": 0.7061209439528024
+    }
+   },
+   {
+    "expert": "Qwen3-4B 제로샷 (거대언어모델)",
+    "base": "하이브리드 다국어 e5 · 초파리 투표",
     "budget": 1.0,
     "test_acc": 0.9262256068538791,
     "external_ba": 0.7666129592139199,
@@ -3805,5 +3997,35 @@
    "jh_auc": 0.8974868195162585,
    "test_acc": 0.9524036173250833
   }
- ]
+ ],
+ "residual": {
+  "slot": 23,
+  "slot_kcs": 480,
+  "demo": {
+   "test_acc": 0.9081389814374108,
+   "detect": {
+    "over_defense": 0.6830094461208045,
+    "direct": 0.5861408807812123,
+    "jailbreak": 0.576841243398835,
+    "agentic": 0.5839754802838806,
+    "indirect": 0.5477431286992523,
+    "mixed": 0.5581442876209671,
+    "korean": 0.6193417062149515
+   },
+   "detect_mean": 0.5935994533028434
+  },
+  "residual": {
+   "test_acc": 0.9048072346501665,
+   "detect": {
+    "over_defense": 0.6056420679770274,
+    "direct": 0.4664709425211646,
+    "jailbreak": 0.5309295035243987,
+    "agentic": 0.4933161945934147,
+    "indirect": 0.3701897858314602,
+    "mixed": 0.4096326762998348,
+    "korean": 0.3573813033115396
+   },
+   "detect_mean": 0.46193749629412
+  }
+ }
 }

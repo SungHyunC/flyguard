@@ -29,7 +29,14 @@ SHORT = {
     "하이브리드 ModernBERT · 헤드 앙상블": "하이브리드 MB · 헤드", "하이브리드 MiniLM · 초파리 투표": "하이브리드 MiniLM · 초파리",
     "하이브리드 MiniLM · 헤드 앙상블": "하이브리드 MiniLM · 헤드", "ProtectAI DeBERTa v2 (외부 전문 탐지기)": "ProtectAI (외부)",
     "Qwen2.5-1.5B 제로샷 (거대언어모델)": "Qwen2.5-1.5B (LLM)", "Qwen3-4B 제로샷 (거대언어모델)": "Qwen3-4B (LLM)",
+    "Qwen3-4B 정의·예시 8개 (거대언어모델)": "Qwen3-4B 정의·예시 (LLM)",
+    "하이브리드 다국어 e5 · 초파리 투표": "하이브리드 e5 · 초파리", "하이브리드 다국어 e5 · 헤드 앙상블": "하이브리드 e5 · 헤드",
+    "ModernBERT 미세조정 1개 (글자 보강)": "ModernBERT (글자 보강)", "ModernBERT 미세조정 1개 (한국어 보강)": "ModernBERT (한국어 보강)",
+    "다국어 e5 미세조정 1개": "e5 미세조정", "다국어 e5 미세조정 1개 (한국어 보강)": "e5 (한국어 보강)",
 }
+# fig7 draws at most three deploy lines (three validated colours): one single model, the ModernBERT hybrid and the e5 hybrid.
+MAP_BASES = ("ModernBERT 미세조정 1개", "하이브리드 ModernBERT · 초파리 투표", "하이브리드 다국어 e5 · 초파리 투표")
+MAP_EXPERT = "Qwen3-4B 제로샷 (거대언어모델)"
 
 
 def style():
@@ -137,7 +144,7 @@ def generalization():
     ax.set_ylim(lo - 2, hi + 2.5)
     ax.set_xlim(df.latency.min() / 1.6, df.latency.max() * 4)
     plain_log_ticks(ax)
-    ax.legend(loc="lower right", fontsize=9)
+    fig.legend(*ax.get_legend_handles_labels(), loc="lower center", ncol=2, fontsize=9, bbox_to_anchor=(0.5, -0.07))
     place_labels(ax, df.latency.to_numpy(), (df.external * 100).to_numpy(), [SHORT.get(m, m) for m in df.model])
     save(fig, "fig2_latency_vs_robustness.png")
 
@@ -265,12 +272,15 @@ def fly():
         save(fig, "fig6_few_labels.png")
     if "familiarity" in res and res["familiarity"].get("deploy"):
         dep = pd.DataFrame(res["familiarity"]["deploy"])
-        dep = dep[dep.expert.str.startswith("Qwen3")]
+        dep = dep[(dep.expert == MAP_EXPERT) & dep.base.isin(MAP_BASES)]
         singles = model_summary()
         fig, ax = plt.subplots(figsize=(8.2, 5.4))
         ax.plot(singles.test * 100, singles.external * 100, "o", color=GRAY, linestyle="none", label="모델 하나만", zorder=2)
-        for (base, g), color in zip(dep.groupby("base", sort=False), (BLUE, ORANGE, AQUA)):
-            g = g.sort_values("budget")
+        line_pts = []
+        for base, color in zip([b for b in MAP_BASES if (dep.base == b).any()], (BLUE, ORANGE, AQUA)):
+            g = dep[dep.base == base].sort_values("budget")
+            xy = np.column_stack([g.test_acc * 100, g.external_ba * 100])
+            line_pts += [a + (b - a) * f for a, b in zip(xy[:-1], xy[1:]) for f in np.linspace(0, 1, 40)]
             ax.plot(g.test_acc * 100, g.external_ba * 100, "-o", color=color, markersize=5, zorder=3,
                     label=f"{SHORT.get(base, base)} → Qwen3-4B")
             ten = g[g.budget == 0.1]
@@ -284,7 +294,7 @@ def fly():
                  fontsize=8, color=MUTED)
         place_labels(ax, (singles.test * 100).to_numpy(), (singles.external * 100).to_numpy(),
                      [SHORT.get(m, m) for m in singles.model], fontsize=7.5,
-                     obstacles=np.column_stack([dep.test_acc * 100, dep.external_ba * 100]))
+                     obstacles=np.array(line_pts) if line_pts else None)
         save(fig, "fig7_inside_outside_map.png")
     if "online_korean" in res:
         onl = pd.DataFrame(res["online_korean"])

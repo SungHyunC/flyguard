@@ -5,3 +5,4 @@ web/fallback.js
 reports/*.log
 __pycache__/
 reports/generalization/rows.parquet
+reports/generalization/partial_*.npy
